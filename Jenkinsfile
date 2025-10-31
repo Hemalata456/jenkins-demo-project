@@ -1,46 +1,54 @@
 pipeline {
     agent any
-    tools {
-        git 'Default'
-    }
-    
+
     stages {
         stage('Checkout') {
             steps {
-                git branch:'main', url:'https://github.com/hemalata456/jenkins-demo-project.git'
+                git branch: 'main', url: 'https://github.com/hemalata456/jenkins-demo-project.git'
             }
         }
+
         stage('Build') {
             steps {
                 echo 'Building...'
                 sh 'echo "Building the application..."'
             }
         }
+
         stage('Test') { 
             steps {
                 echo 'Testing...'
                 sh 'echo "Running tests..."'
             }
         }
+
         stage('Dockerize') {
             steps {
-                echo 'Dockerizing application...'
-                sh 'echo "Creating Docker image..."'
                 script {
-                    dockerImage = docker.build('webapp')
+                    echo 'Dockerizing application...'
+                    sh 'echo "Creating Docker image..."'
+                    // Define the docker image variable properly
+                    def dockerImage = docker.build("webapp:latest")
                 }
             }
         }
+
         stage('Deploy') {
             steps {
-                echo 'Deploying application...'
-                sh 'docker run -d -p 8080:8080 webapp'   
+                script {
+                    echo 'Deploying application...'
+                    sh 'docker run -d -p 8080:8080 webapp:latest'
+                }
             }
         }
     }
+
     post {
         success {
-            echo 'Pipeline completed successfully!'
+            echo '✅ Pipeline completed successfully!'
+        }
+        failure {
+            echo '❌ Pipeline failed!'
         }
     }
 }
