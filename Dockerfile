@@ -1,9 +1,7 @@
-# Use nginx to serve a simple static HTML site
+# Use nginx base image
 FROM nginx:alpine
 
-# Remove default nginx content and copy site into the default web root
-RUN rm -rf /usr/share/nginx/html/*
+# Copy HTML files into Nginx web root
 COPY . /usr/share/nginx/html
 
-# Default command (inherited from nginx:alpine, kept for clarity)
-CMD ["nginx", "-g", "daemon off;"]
+EXPOSE 80

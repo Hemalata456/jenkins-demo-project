@@ -8,47 +8,33 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Build Docker Image') {
             steps {
-                echo 'Building...'
-                sh 'echo "Building the application..."'
+                echo 'Building Docker image...'
+                sh '''
+                    export DOCKER_BUILDKIT=0
+                    docker build -t webapp .
+                '''
             }
         }
 
-        stage('Test') { 
+        stage('Run Container') {
             steps {
-                echo 'Testing...'
-                sh 'echo "Running tests..."'
-            }
-        }
-
-        stage('Dockerize') {
-            steps {
-                script {
-                    echo 'Dockerizing application...'
-                    sh 'echo "Creating Docker image..."'
-                    // Define the docker image variable properly
-                    def dockerImage = docker.build("webapp:latest")
-                }
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                script {
-                    echo 'Deploying application...'
-                    sh 'docker run -d -p 8080:8080 webapp:latest'
-                }
+                echo 'Running Docker container...'
+                sh '''
+                    docker rm -f webapp || true
+                    docker run -d --name webapp -p 8080:80 webapp
+                '''
             }
         }
     }
 
     post {
         success {
-            echo '✅ Pipeline completed successfully!'
+            echo '✅ Deployment successful! Visit http://<server-ip>:8080'
         }
         failure {
-            echo '❌ Pipeline failed!'
+            echo '❌ Something went wrong. Check console output.'
         }
     }
 }
