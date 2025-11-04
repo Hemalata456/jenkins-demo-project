@@ -36,7 +36,7 @@ pipeline {
             steps {
                 script {
                     echo 'Deploying application...'
-                    sh 'docker run -d -p 8082:8080 webapp:latest'
+                    sh 'docker run -d -p 8082:8080 webapp2:latest'
                 }
             }
         }
